@@ -1,0 +1,36 @@
+services:
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio_segmenai
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Web console
+    environment:
+  MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+  MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./localminio:/data
+    command: server /data --console-address ":9001"
+
+  segmenai:
+    build: .
+    container_name: segmenai_app
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    depends_on:
+      - minio
+    environment:
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    command: >
+      sh -c "
+        echo 'Waiting for MinIO to be ready...' &&
+        until curl -s http://minio:9000/minio/health/live; do
+          sleep 2
+        done &&
+        echo 'MinIO is ready. Starting Streamlit...' &&
+        streamlit run segmenai.py --server.port 8501 --server.address 0.0.0.0
+      "
