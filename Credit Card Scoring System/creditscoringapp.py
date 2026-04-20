@@ -32,8 +32,6 @@ FEATURE_COLUMNS = [
     "NumberRealEstateLoansOrLines",
     "NumberOfTime60-89DaysPastDueNotWorse",
     "NumberOfDependents",
-    "TotalPastDue",
-    "DebtPerIncome"
 ]
 
 # ---------------------------
@@ -76,13 +74,6 @@ try:
     data_df = clean_numeric_columns(data_df)
     data_df.fillna(data_df.median(), inplace=True)
 
-    # Feature engineering
-    data_df['TotalPastDue'] = (
-        data_df['NumberOfTime30-59DaysPastDueNotWorse'] +
-        data_df['NumberOfTime60-89DaysPastDueNotWorse'] +
-        data_df['NumberOfTimes90DaysLate']
-    )
-    data_df['DebtPerIncome'] = data_df['DebtRatio'] * data_df['MonthlyIncome']
     data_df = data_df[FEATURE_COLUMNS]
 
     st.success("Dataset loaded from Cloudflare R2 bucket")
@@ -95,9 +86,9 @@ except Exception as e:
 # Load Models
 # ---------------------------
 try:
-    logreg_model = joblib.load("models/logreg_v2.pkl")
+    logreg_model = joblib.load("models/logreg_v3.pkl")
     xgb_model = joblib.load("models/xgb_best.pkl")
-    scaler = joblib.load("models/scaler_v2.pkl")
+    scaler = joblib.load("models/scaler_v3.pkl")
     st.success("Models loaded successfully")
 except Exception as e:
     st.error(f"Model load error: {e}")
@@ -150,7 +141,7 @@ try:
 
     st.markdown("**Top 3 features influencing the XGBoost prediction:**")
     for i, row in feature_impact.head(3).iterrows():
-        direction = "increases" if row['SHAP_Value'] > 0 else "decreases"
+        direction = "increases" if row['SHAP_Value'] < 0 else "decreases"
         st.write(f"- {row['Feature']} {direction} the likelihood of delinquency (impact: {row['SHAP_Value']:.2f})")
 
 except Exception as e:
@@ -167,13 +158,6 @@ if file:
     batch = pd.read_csv(file)
     batch = clean_numeric_columns(batch)
     batch.fillna(batch.median(), inplace=True)
-
-    batch['TotalPastDue'] = (
-        batch['NumberOfTime30-59DaysPastDueNotWorse'] +
-        batch['NumberOfTime60-89DaysPastDueNotWorse'] +
-        batch['NumberOfTimes90DaysLate']
-    )
-    batch['DebtPerIncome'] = batch['DebtRatio'] * batch['MonthlyIncome']
 
     batch_features = batch[FEATURE_COLUMNS]
     batch_scaled = scaler.transform(batch_features)
