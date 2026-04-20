@@ -115,10 +115,9 @@ Customer Credit Data → Cloudflare R2 → Streamlit App → Predictions + SHAP 
 ```
 
 1. **Data Load** – Dataset accessed from Cloudflare R2
-2. **Feature Engineering** – Compute `TotalPastDue` and `DebtPerIncome`
-3. **Prediction** – Score default probability using ML models
-4. **Interpretation** – SHAP waterfall plots identify top predictors
-5. **Batch Upload** – Option to upload custom CSVs for predictions
+2. **Prediction** – Score default probability using ML models
+3. **Interpretation** – SHAP waterfall plots identify top predictors
+4. **Batch Upload** – Option to upload custom CSVs for predictions
 
 ---
 
