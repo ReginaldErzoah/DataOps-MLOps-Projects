@@ -2,7 +2,7 @@ This repository is dedicated to DataOps & MLOps related projects.
 Building and deploying data apps using ML models and other data tools.
 
 Below is a log of projects so far.
-More details are in their respective repositories.
+For more details on each project, check their main repos.
 
 1. Credit Card Fraud Detection App. [Repo Link](https://github.com/ReginaldErzoah/Credit-Card-Fraud-Detection-App)
 2. SegmenAI - Customer Segmentation App. [Repo Link](https://github.com/ReginaldErzoah/SegmenAI)
